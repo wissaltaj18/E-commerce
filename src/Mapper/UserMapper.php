@@ -2,13 +2,13 @@
 
 namespace App\Mapper;
 
-use App\DTO\RegistrationDTO;
+use App\DTO\RegisterDTO;
 use App\Entity\User;
 use App\DTO\LoginResponseDTO;   
 
 class UserMapper
 {
-    public function toEntity(RegistrationDTO $dto): User
+    public function toEntity(RegisterDTO $dto): User
     {
         $user = new User();
 

@@ -88,7 +88,7 @@ class Cart
     {
         $total = 0;
         foreach ($this->cartItems as $item) {
-            // Rappel : assure-toi que getPrice() existe dans CartItem
+           
             $total += $item->getPrice() * $item->getQuantity();
         }
         return $total;

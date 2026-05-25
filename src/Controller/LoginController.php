@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\DTO\RegistrationDTO;
+use App\DTO\RegisterDTO;
 use App\Form\RegistrationFormType;
-use App\Service\Register\RegistrationService;
+use App\Service\RegisterService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,11 +16,11 @@ class LoginController extends AbstractController
     #[Route('/login', name: 'app_auth')]
     public function index(
         Request $request,
-        RegistrationService $service,
+        RegisterService $service,
         AuthenticationUtils $authenticationUtils
     ): Response {
 
-        $registerDto = new RegistrationDTO();
+        $registerDto = new RegisterDTO();
         $registerForm = $this->createForm(RegistrationFormType::class, $registerDto);
 
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -33,13 +33,13 @@ class LoginController extends AbstractController
         ]);
     }
 
-    // ✅ CORRECTION : route séparée pour le register
+    
     #[Route('/register', name: 'app_register', methods: ['POST'])]
     public function register(
         Request $request,
-        RegistrationService $service,
+        RegisterService $service,
     ): Response {
-        $registerDto = new RegistrationDTO();
+        $registerDto = new RegisterDTO();
         $registerForm = $this->createForm(RegistrationFormType::class, $registerDto);
         $registerForm->handleRequest($request);
 

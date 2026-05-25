@@ -1,13 +1,13 @@
 <?php
-namespace App\Service\Register;
+namespace App\Service;
 
-use App\DTO\RegistrationDTO;
+use App\DTO\RegisterDTO;
 use App\Entity\User;
 use App\Mapper\UserMapper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class RegistrationService
+class RegisterService
 {
     public function __construct(
         private EntityManagerInterface $em,
@@ -15,7 +15,7 @@ class RegistrationService
         private UserMapper $mapper
     ) {}
 
-    public function register(RegistrationDTO $dto): User
+    public function register(RegisterDTO $dto): User
     {
         $user = $this->mapper->toEntity($dto);
         $hashed = $this->hasher->hashPassword($user, $dto->password);
