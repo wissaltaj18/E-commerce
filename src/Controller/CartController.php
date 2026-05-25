@@ -2,82 +2,80 @@
 
 namespace App\Controller;
 
-use App\Entity\Product;
-use App\Entity\Cart;
-use App\Entity\CartItem;
-use App\Service\Handlers\CartHandler;
-use App\Interface\CartInterface;
-use App\Service\SessionCart;
-use App\DTO\CartItemDTO;
-use App\Mapper\CartItemMapper;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class CartController extends AbstractController
+class CartController extends AbstractController
 {
-    public function __construct(
-        private CartHandler $handler,
-        #[Autowire(service: SessionCart::class)]
-        private CartInterface $cartStrategy
-    ) {}
-
-        #[Route('/cart', name: 'cart')]
-        public function index(SessionCart $cartService): Response
-        {
-            $cart = $cartService->getCart('main_cart');
-
-            return $this->render('cart/cart.html.twig', [
-                'items' => $cart->getCartItems()
-            ]);
-        }
-
-        #[Route('/cart/add/{id}', name: 'cart_add', methods: ['POST'])]
-        public function add(
-            int $id,
-            Request $request,
-            EntityManagerInterface $em
-        ): Response {
-
-            $product = $em->find(Product::class, $id);
-
-            if (!$product) {
-                throw $this->createNotFoundException('Produit inexistant.');
-            }
-
-            $quantity = (int) $request->request->get('quantity', 1);
-
-            $dto = new CartItemDTO(
-                $product->getId(),
-                $quantity,
-                $product->getPrice()
-            );
-
-            $mapper = new CartItemMapper();
-            $cartItem = $mapper->toEntity($dto, $product);
-            $cart = $this->cartStrategy->getCart('main_cart');
-
-            $this->cartStrategy->add($cartItem, $cart);
-
-            $this->addFlash('success', 'Produit ajouté !');
-
-            return $this->redirectToRoute('cart');
-            }
-    #[Route('/cart/remove/{id}', name: 'cart_remove', methods: ['POST'])]
-    public function remove(int $id, SessionCart $cartService): Response
+    #[Route('/cart', name: 'cart')]
+    public function index(SessionInterface $session): Response
     {
-        $cart = $cartService->getCart('main_cart');
+        $cart = $session->get('cart', []);
+        $total = array_sum(array_column($cart, 'total'));
 
-        foreach ($cart->getCartItems() as $item) {
-            if ($item->getProduct()->getId() === $id) {
-                $cartService->remove($item, $cart);
-                break;
-            }
+        return $this->render('cart/index.html.twig', [
+            'cart' => $cart,
+            'total' => $total,
+        ]);
+    }
+
+    // ✅ price enlevé de la route, récupéré depuis la BDD
+    #[Route('/cart/add/{id}', name: 'cart_add')]
+    public function add(
+        int $id,
+        Request $request,
+        SessionInterface $session,
+        ProductRepository $productRepository
+    ): Response {
+        $product = $productRepository->find($id);
+
+        if (!$product) {
+            throw $this->createNotFoundException('Produit non trouvé');
         }
 
+        $quantity = (int) $request->request->get('quantity', 1);
+        $cart = $session->get('cart', []);
+
+        if (isset($cart[$id])) {
+            $cart[$id]['quantity'] += $quantity;
+            $cart[$id]['total'] = $cart[$id]['quantity'] * $product->getPrice();
+        } else {
+            $cart[$id] = [
+                'id' => $id,
+                'name' => $product->getName(),
+                'quantity' => $quantity,
+                'price' => $product->getPrice(),
+                'total' => $quantity * $product->getPrice(),
+            ];
+        }
+
+        $session->set('cart', $cart);
+
+        return $this->redirectToRoute('cart');
+    }
+
+    #[Route('/cart/remove/{id}', name: 'cart_remove')]
+    public function remove(int $id, SessionInterface $session): Response
+    {
+        $cart = $session->get('cart', []);
+
+        if (isset($cart[$id])) {
+            unset($cart[$id]);
+        }
+
+        $session->set('cart', $cart);
+
+        return $this->redirectToRoute('cart');
+    }
+
+    #[Route('/cart/clear', name: 'cart_clear')]
+    public function clear(SessionInterface $session): Response
+    {
+        $session->remove('cart');
         return $this->redirectToRoute('cart');
     }
 }

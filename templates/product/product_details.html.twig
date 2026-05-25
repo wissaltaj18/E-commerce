@@ -1,4 +1,4 @@
-{# templates/product_details.html.twig #}
+{# templates/product/product_details.html.twig #}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -33,8 +33,10 @@
 <!-- Product Details Section -->
 <div class="container my-5">
     <div class="row">
-          <div class="col-md-6">
-                <img src="{{ asset('airbod.png') }}" alt="Produit">
+
+        <!-- Product Image -->
+        <div class="col-md-6">
+            <img src="{{ asset('airbod.png') }}" alt="{{ product.name }}" class="img-fluid rounded shadow">
         </div>
 
         <!-- Product Information -->
@@ -48,9 +50,8 @@
                 </ol>
             </nav>
 
-            
             <h1 class="mb-3">{{ product.name }}</h1>
-            
+
             <h3 class="text-success mb-4">${{ product.price }}</h3>
 
             <div class="mb-4">
@@ -58,41 +59,41 @@
                 <p class="text-muted">{{ product.description }}</p>
             </div>
 
+            {# ✅ CORRECTION : price enlevé de l'URL #}
             <form action="{{ path('cart_add', {'id': product.id}) }}" method="POST">
-            <div class="mb-3">
-                <label for="quantity" class="form-label">Quantity</label>
-                <input type="number" 
-                    class="form-control" 
-                    id="quantity" 
-                    name="quantity" 
-                    value="1" 
-                    min="1" 
-                    max="10" 
-                    style="max-width: 100px;">
-            </div>
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantity</label>
+                    <input type="number"
+                           class="form-control"
+                           id="quantity"
+                           name="quantity"
+                           value="1"
+                           min="1"
+                           max="10"
+                           style="max-width: 100px;">
+                </div>
 
-            <div class="d-grid gap-2 d-md-flex">
-                <button type="submit" class="btn btn-primary btn-lg">Add to Cart</button>
-                class="btn btn-outline-secondary btn-lg">Continue Shopping</a>
-            </div>
-        </form>
+                <div class="d-grid gap-2 d-md-flex">
+                    <button type="submit" class="btn btn-primary btn-lg">Add to Cart</button>
+                    <a href="{{ path('products') }}" class="btn btn-outline-secondary btn-lg">Continue Shopping</a>
+                </div>
+            </form>
 
             <!-- Additional Info -->
             <div class="mt-4 pt-4 border-top">
                 <ul class="list-unstyled">
-                    <li class="mb-2"><strong>SKU:</strong> {{ product.sku ?? 'N/A' }}</li>
-                    <li class="mb-2"><strong>Availability:</strong> 
+                    <li class="mb-2">
+                        <strong>Availability:</strong>
                         {% if product.stock is defined and product.stock > 0 %}
                             <span class="text-success">In Stock</span>
                         {% else %}
                             <span class="text-danger">Out of Stock</span>
                         {% endif %}
                     </li>
-                
                 </ul>
             </div>
-        </div>
 
+        </div>
     </div>
 </div>
 
