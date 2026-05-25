@@ -72,17 +72,20 @@
 
                             <h3 class="mb-4">Register</h3>
 
-                            {# ✅ CORRECTION : action vers app_register pour éviter le firewall #}
-                            {{ form_start(form, {'action': path('app_register'), 'method': 'POST'}) }}
+                            {# ✅ Flash message #}
+                            {% for message in app.flashes('success') %}
+                                <div class="alert alert-success">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
 
+                            {{ form_start(form, {'action': path('app_register'), 'method': 'POST'}) }}
                                 {{ form_row(form.name) }}
                                 {{ form_row(form.email) }}
                                 {{ form_row(form.password) }}
-
                                 <button class="btn btn-success w-100">
                                     Sign up
                                 </button>
-
                             {{ form_end(form) }}
 
                         </div>

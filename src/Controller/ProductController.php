@@ -21,15 +21,15 @@ final class ProductController extends AbstractController
         $this->categoryRepository = $categoryRepository;
     }
 
-    // Affiche tous les produits si aucune catégorie n'est spécifiée
+    // Affiche tous les produits triés par nom
     #[Route('/products', name: 'products')]
     public function index(): Response
     {
-        $products = $this->productRepository->findAll();
+        // ✅ Trié par nom ASC au lieu de findAll()
+        $products = $this->productRepository->findBy([], ['name' => 'ASC']);
 
         return $this->render('product/index.html.twig', [
             'products' => $products,
-           
         ]);
     }
 
@@ -40,12 +40,14 @@ final class ProductController extends AbstractController
         $category = $this->categoryRepository->find($id);
 
         if (!$category) {
-            throw $this->createNotFoundException('Catégorie non trouvée');
+            throw $this->createNotFoundException('Cette catégorie n\'existe pas.');
         }
 
-        $products = $this->productRepository->findBy([
-            'category' => $category
-        ]);
+        // ✅ Trié par nom ASC
+        $products = $this->productRepository->findBy(
+            ['category' => $category],
+            ['name' => 'ASC']
+        );
 
         return $this->render('product/products_by_category.html.twig', [
             'products' => $products,
@@ -60,7 +62,8 @@ final class ProductController extends AbstractController
         $product = $this->productRepository->find($id);
 
         if (!$product) {
-            throw $this->createNotFoundException('Produit non trouvé');
+            // ✅ Message d'erreur personnalisé
+            throw $this->createNotFoundException('Ce produit n\'existe pas ou a été supprimé.');
         }
 
         return $this->render('product/product_details.html.twig', [

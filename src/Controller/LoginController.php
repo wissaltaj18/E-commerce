@@ -33,7 +33,6 @@ class LoginController extends AbstractController
         ]);
     }
 
-    
     #[Route('/register', name: 'app_register', methods: ['POST'])]
     public function register(
         Request $request,
@@ -45,6 +44,10 @@ class LoginController extends AbstractController
 
         if ($registerForm->isSubmitted() && $registerForm->isValid()) {
             $service->register($registerDto);
+
+            
+            $this->addFlash('success', 'Compte créé avec succès ! Connectez-vous.');
+
             return $this->redirectToRoute('app_auth');
         }
 
@@ -54,6 +57,11 @@ class LoginController extends AbstractController
     #[Route('/auth/show', name: 'auth_show')]
     public function show(): Response
     {
+        // ✅ Vérifie que l'utilisateur est connecté
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_auth');
+        }
+
         return $this->render('auth/show.html.twig', [
             'user' => $this->getUser()
         ]);
