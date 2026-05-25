@@ -62,7 +62,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->name = ucwords(strtolower(trim($name)));
         return $this;
     }
-
+// test git
     // ✅ Retourne les initiales de l'utilisateur
     public function getInitials(): string
     {
