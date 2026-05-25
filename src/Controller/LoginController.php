@@ -66,7 +66,7 @@ class LoginController extends AbstractController
             'user' => $this->getUser()
         ]);
     }
-
+//n
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void {}
 }
