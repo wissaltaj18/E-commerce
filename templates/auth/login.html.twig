@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Our Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ path('products') }}">Our Store</a>
+
+        <div>
+            <a class="nav-link text-white d-inline" href="{{ path('products') }}">Products</a>
+            <a class="nav-link text-white d-inline" href="{{ path('cart') }}">Cart</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="row g-0">
+
+                    <!-- LOGIN -->
+                    <div class="col-md-6">
+                        <div class="card-body p-5">
+
+                            <h3 class="mb-4">Login</h3>
+
+                            {% if error %}
+                                <div class="alert alert-danger">
+                                    Invalid credentials
+                                </div>
+                            {% endif %}
+
+                            <form method="post" action="{{ path('app_auth') }}">
+
+                                <div class="mb-3">
+                                    <input type="email"
+                                           name="_username"
+                                           class="form-control"
+                                           placeholder="Email"
+                                           value="{{ last_username|default('') }}"
+                                           required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <input type="password"
+                                           name="_password"
+                                           class="form-control"
+                                           placeholder="Password"
+                                           required>
+                                </div>
+
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                                <button type="submit" class="btn btn-primary w-100">
+                                    Login
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+
+                    <!-- REGISTER -->
+                    <div class="col-md-6 bg-light">
+                        <div class="card-body p-5">
+
+                            <h3 class="mb-4">Register</h3>
+
+                            {# ✅ CORRECTION : action vers app_register pour éviter le firewall #}
+                            {{ form_start(form, {'action': path('app_register'), 'method': 'POST'}) }}
+
+                                {{ form_row(form.name) }}
+                                {{ form_row(form.email) }}
+                                {{ form_row(form.password) }}
+
+                                <button class="btn btn-success w-100">
+                                    Sign up
+                                </button>
+
+                            {{ form_end(form) }}
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<footer class="bg-dark text-white text-center py-3 mt-5">
+    Our Store © 2026
+</footer>
+
+</body>
+</html>
