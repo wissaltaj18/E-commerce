@@ -1,4 +1,4 @@
-{# templates/product/products.html.twig #}
+{# templates/product/index.html.twig #}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -50,6 +50,21 @@
 <div class="container my-5">
     <h1 class="mb-4">Our Products</h1>
 
+    <!-- Search Bar -->
+    <form action="{{ path('products') }}" method="get" class="row g-2 mb-4">
+        <div class="col-auto flex-grow-1">
+            <input type="text" name="q" value="{{ searchQuery|default('') }}" class="form-control" placeholder="Rechercher un produit...">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+        </div>
+        {% if searchQuery is defined and searchQuery %}
+            <div class="col-auto">
+                <a href="{{ path('products') }}" class="btn btn-outline-secondary">Réinitialiser</a>
+            </div>
+        {% endif %}
+    </form>
+
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for product in products %}
             <div class="col">
@@ -67,6 +82,39 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- Why Choose Us Section -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Pourquoi nous choisir ?</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4 text-center">
+            <div class="col">
+                <div class="card h-100 border-0 bg-transparent">
+                    <div class="card-body">
+                        <h5 class="card-title">Livraison rapide</h5>
+                        <p class="card-text">Vos commandes expédiées sous 24h.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 border-0 bg-transparent">
+                    <div class="card-body">
+                        <h5 class="card-title">Paiement sécurisé</h5>
+                        <p class="card-text">Transactions protégées de bout en bout.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 border-0 bg-transparent">
+                    <div class="card-body">
+                        <h5 class="card-title">Support réactif</h5>
+                        <p class="card-text">Une équipe disponible 7j/7.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Footer -->
 <footer class="bg-dark text-white mt-5 py-4">

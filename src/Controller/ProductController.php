@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\ProductRepository;
 use App\Repository\CategoryRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -21,15 +22,22 @@ final class ProductController extends AbstractController
         $this->categoryRepository = $categoryRepository;
     }
 
-    // Affiche tous les produits triés par nom
+    // Affiche tous les produits triés par nom, avec recherche optionnelle par nom (?q=...)
     #[Route('/products', name: 'products')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        // ✅ Trié par nom ASC au lieu de findAll()
-        $products = $this->productRepository->findBy([], ['name' => 'ASC']);
+        $query = trim((string) $request->query->get('q', ''));
+
+        if ($query !== '') {
+            $products = $this->productRepository->searchByName($query);
+        } else {
+            // ✅ Trié par nom ASC au lieu de findAll()
+            $products = $this->productRepository->findBy([], ['name' => 'ASC']);
+        }
 
         return $this->render('product/index.html.twig', [
             'products' => $products,
+            'searchQuery' => $query,
         ]);
     }
 
