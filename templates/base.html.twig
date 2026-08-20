@@ -12,6 +12,11 @@
 </head>
 <body>
 
+{% set cartNs = namespace(count=0) %}
+{% for item in app.session.get('cart', []) %}
+    {% set cartNs.count = cartNs.count + item.quantity %}
+{% endfor %}
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="{{ path('products') }}">Our Store</a>
@@ -24,7 +29,12 @@
                     <a class="nav-link {% block nav_products %}{% endblock %}" href="{{ path('products') }}">Products</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% block nav_cart %}{% endblock %}" href="{{ path('cart') }}">Cart</a>
+                    <a class="nav-link {% block nav_cart %}{% endblock %} position-relative" href="{{ path('cart') }}">
+                        Cart
+                        {% if cartNs.count > 0 %}
+                            <span class="badge rounded-pill bg-danger ms-1">{{ cartNs.count }}</span>
+                        {% endif %}
+                    </a>
                 </li>
                 <li class="nav-item ms-3">
                     {% if app.user %}
