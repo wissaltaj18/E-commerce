@@ -16,7 +16,6 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-    // Récupérer les produits par catégorie
     public function findByCategory($categoryId): array
     {
         return $this->createQueryBuilder('p')
@@ -27,37 +26,10 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    // ✅ Recherche par nom
-    public function searchByName(string $query): array
-    {
-        return $this->createQueryBuilder('p')
-            ->where('p.name LIKE :query')
-            ->setParameter('query', '%' . $query . '%')
-            ->orderBy('p.name', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    // ✅ Produits les plus récents
-    public function findLatest(int $limit = 6): array
-    {
-        return $this->createQueryBuilder('p')
-            ->orderBy('p.id', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
-    }
-
-    // ✅ Compter le nombre total de produits
-    public function countAll(): int
-    {
-        return $this->createQueryBuilder('p')
-            ->select('COUNT(p.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    // ✅ KAN-4 : recherche combinée nom + catégorie (les deux paramètres sont optionnels)
+    /**
+     * Recherche combinee nom + categorie (les deux parametres sont optionnels).
+     * Point d'entree unique pour toutes les recherches produits.
+     */
     public function search(?string $name, ?int $categoryId): array
     {
         $qb = $this->createQueryBuilder('p')
@@ -75,5 +47,30 @@ class ProductRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Recherche par nom uniquement -- delegue a search() pour eviter la duplication.
+     */
+    public function searchByName(string $query): array
+    {
+        return $this->search($query, null);
+    }
+
+    public function findLatest(int $limit = 6): array
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.id', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countAll(): int
+    {
+        return $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

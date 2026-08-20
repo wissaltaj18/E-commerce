@@ -22,22 +22,29 @@ final class ProductController extends AbstractController
         $this->categoryRepository = $categoryRepository;
     }
 
-    // Affiche tous les produits triés par nom, avec recherche optionnelle par nom (?q=...)
+    // Affiche tous les produits triés par nom, avec recherche (?q=...) et filtre catégorie (?category=...) optionnels
     #[Route('/products', name: 'products')]
     public function index(Request $request): Response
     {
         $query = trim((string) $request->query->get('q', ''));
 
-        if ($query !== '') {
-            $products = $this->productRepository->searchByName($query);
+        $categoryParam = $request->query->get('category');
+        $categoryId = ($categoryParam !== null && $categoryParam !== '') ? (int) $categoryParam : null;
+
+        if ($query !== '' || $categoryId !== null) {
+            $products = $this->productRepository->search($query !== '' ? $query : null, $categoryId);
         } else {
             // ✅ Trié par nom ASC au lieu de findAll()
             $products = $this->productRepository->findBy([], ['name' => 'ASC']);
         }
 
+        $categories = $this->categoryRepository->findAllCategories();
+
         return $this->render('product/index.html.twig', [
             'products' => $products,
             'searchQuery' => $query,
+            'categories' => $categories,
+            'selectedCategory' => $categoryId,
         ]);
     }
 
