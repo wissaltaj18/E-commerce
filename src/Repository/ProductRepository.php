@@ -56,4 +56,24 @@ class ProductRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    // ✅ KAN-4 : recherche combinée nom + catégorie (les deux paramètres sont optionnels)
+    public function search(?string $name, ?int $categoryId): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->orderBy('p.name', 'ASC');
+
+        if ($name !== null && $name !== '') {
+            $qb->andWhere('p.name LIKE :name')
+               ->setParameter('name', '%' . $name . '%');
+        }
+
+        if ($categoryId !== null) {
+            $qb->join('p.category', 'c')
+               ->andWhere('c.id = :categoryId')
+               ->setParameter('categoryId', $categoryId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }
