@@ -42,6 +42,7 @@ final class AppFixtures extends Fixture
         ['Gants de Boxe', 349, 'Cuir veritable, protection maximale, 10oz', 'gants.jpg', 3],
         ['Creme Hydratante Visage', 199, '100% naturelle, SPF30, peaux sensibles', 'creme.jpg', 4],
         ['Parfum Oriental', 599, 'Notes de bois et epices, flacon 50ml', 'parfum.jpg', 4],
+        ['TV Samsung 55 pouces', 8999, 'Smart TV 4K, HDR, 55 pouces, Netflix integre', 'TV Samsung.jpg', 0],
     ];
 
     public function load(ObjectManager $manager): void
